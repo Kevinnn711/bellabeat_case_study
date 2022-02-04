@@ -1,0 +1,247 @@
+---
+title: "Bellabeat Case Study"
+author: "Kevin Nemec"
+date: "11/9/2021"
+output: html_document
+---
+# Introduction:
+Bellabeat is a wellness company that develops wearable smart devices for women by women. Bellabeat uses its many smart devices and its paired app to collect data that helps give their customers insights into their health and lifestyle with guidance on how to improve them.
+
+## Bellabeat Product Line:
+* **Ivy:** This wellness tracker is worn on your wrist and monitors heart rate, cardiac coherence, respiratory rate, activity, menstrual cycle, and sleep.
+
+* **Time:** This wellness watch combines the timeless look of a classic timepiece with smart technology to track user activity, sleep, and stress. The Time watch connects to the Bellabeat app to provide you with insights into your daily wellness.
+
+* **Leaf:** Bellabeat’s classic wellness tracker can be worn as a bracelet, necklace, or clip. The Leaf tracker connects to the Bellabeat app to track activity, sleep, and stress.
+
+* **Spring:** This water bottle tracks daily water intake using smart technology to ensure that you are appropriately hydrated throughout the day. The Spring bottle connects to the Bellabeat app to track your hydration levels.
+
+* **Bellabeat app:** The Bellabeat app provides users with health data related to their activity, sleep, stress, menstrual cycle, and mindfulness habits. This data can help users better understand their current habits and make healthy decisions. The Bellabeat app connects to their line of smart wellness products.
+
+* **Bellabeat membership:** Bellabeat also offers a subscription-based membership program for users. Membership gives users 24/7 access to fully personalized guidance on nutrition, activity, sleep, health and beauty, and mindfulness-based on their lifestyle and goals.
+
+# Ask:
+## Business Task:
+Analyze existing public customer data from a competitor to identify potential growth opportunities and give recommendations for the next steps of the marketing strategy.
+
+## Key Stakeholders:
+* **Urška Sršen:** Bellabeat’s co-founder and Chief Creative Officer
+
+* **Sando Mur:** Mathematician and Bellabeat’s co-founder; a key member of the Bellabeat executive team
+
+* **Bellabeat Marketing Analytics Team:** A team of data analysts responsible for collecting, analyzing, and reporting data that helps guide Bellabeat’s marketing strategy.
+
+## Questions for Analysis:
+* What are some trends in smart device usage?
+* How could these trends apply to Bellabeat customers?
+* How could these trends help influence Bellabeat marketing strategy?
+
+# Prepare:
+The data for this analysis will come from the [Fitbit Fitness Tracker Data](https://www.kaggle.com/arashnic/fitbit) (CC0: Public Domain, dataset made available through [Mobius](https://www.kaggle.com/arashnic)): This Kaggle dataset contains 18 .csv files where the data collected was from 30 individual Fitbit who consented to the submission of personal tracker data, including minute level output for physical activity, heart rate, and sleep monitoring. It includes information about daily activity, steps, and heart rate that can be used to explore users’ habits. This data was collected via an Amazon Mechanical Turk survey between 03-12-2016 and 05-12-2016.
+
+## Exploring Data Credibility With ROCCC Analysis:
+* **Reliability:** The reliability of this data is low because the data was only collected from 30 participants whom you don’t know the gender or age.
+
+* **Originality:** The originality is low. The data is third-party collected using an Amazon Mechanical Turk.
+
+* **Comprehensive:** The comprehensiveness of this data is okay. There is enough data there to draw some conclusions, but it leaves you wishing data was collected on more fields.
+
+* **Current:** This data is five years old and is still very usable.
+
+* **Cited:** The source of this data is well documented.  
+
+## Data Cleaning:
+dailyActivity_merged.csv and sleepDay_merged.csv are opened in Microsoft Excel for data cleaning. The column name SleepDay from sleepDay_merged.csv was changed to ActivityDate to match the date column in dailyActivity_merged.csv. Also, the dates on sleepDay_merged.csv were changed from long date format to short date format to match the date format on dailyActivity_merged.csv.
+
+## Installing and loading packages:
+```{r, message=FALSE}
+install.packages('tidyverse')
+install.packages('dplyr')
+install.packages('janitor')
+install.packages('skimr')
+install.packages('ggpubr')
+install.packages('rmarkdown')
+```
+
+```{r, message=FALSE}
+library(tidyverse)
+library(dplyr)
+library(janitor)
+library(skimr)
+library(ggpubr)
+```
+
+## Importing datasets:
+The data was imported and turned into data frames with simplified names for a more straightforward analysis.
+```{r, message=FALSE}
+daily_activity <- read_csv("dailyActivity_merged.csv")
+sleep_day <- read.csv("sleepDay_merged.csv")
+weight_log <- read.csv("weightLogInfo_merged.csv")
+minute_mets <- read_csv("minuteMETsNarrow_merged.csv")
+heart_rate_sec <- read.csv("heartrate_seconds_merged.csv")
+```
+
+# Process:
+## Viewing Datasets:
+Using the glimpse() function to view the data's quantity and explore the data frames for commonalities that could be used for analysis.
+```{r}
+glimpse(daily_activity)
+```
+```{r}
+glimpse(sleep_day)
+```
+```{r}
+glimpse(weight_log)
+```
+```{r}
+glimpse(minute_mets)
+```
+```{r}
+glimpse(heart_rate_sec)
+```
+
+# Analyze:
+## Summarizing Data:
+Using the n_distinct() function to determine the number of unique values.
+```{r}
+n_distinct(daily_activity$Id)
+```
+```{r}
+n_distinct(sleep_day$Id)
+```
+```{r}
+n_distinct(weight_log$Id)
+```
+```{r}
+n_distinct(minute_mets$Id)
+```
+```{r}
+n_distinct(heart_rate_sec$Id)
+```
+
+
+The summary() function shows critical statistics about the data frames to compare to the research.
+
+#### Daily Activity:
+```{r}
+daily_activity %>% 
+  select(TotalSteps, Calories, TotalDistance, TrackerDistance, SedentaryMinutes, LightlyActiveMinutes, FairlyActiveMinutes, VeryActiveMinutes) %>% 
+  summary()
+```
+This summary shows that, on average, each participant takes 7638 steps a day which comes short of the 10000 steps a day recommended by the CDC by 2362 steps. It also shows that they are burning on average 2304 calories a day, above the average range between 1800-2000 for adults.
+
+
+#### Sleep Day:
+```{r}
+sleep_day %>% 
+  select(TotalMinutesAsleep, TotalTimeInBed) %>% 
+  summary()
+```
+This summary shows that the average participant sleeps 419.5 minutes a night or roughly 7 hours, which meets the CDCs recommendation of 7 hours of sleep a night for adults.
+
+
+#### Weight Log:
+```{r}
+weight_log %>% 
+  select(WeightKg, WeightPounds, Fat, BMI,) %>% 
+  summary()
+```
+The data shows that the average participant BMI was 25.19, slightly above the healthy weight range of 18.5-24.9. The data frame does have a low amount of participants, though.
+
+
+#### Minute METs:
+```{r}
+minute_mets %>% 
+  select(ActivityMinute, METs) %>% 
+  summary()
+```
+The summary of the minute METs data frame shows that the average is 14.69 METs a day. Still, after doing some research, I have found that the average METs per week should be about 500, leading me to believe there is something wrong with how the device collected the data. Therefore this data frame won't be used further in the analysis.
+
+
+#### Heart Rate Sec:
+```{r}
+heart_rate_sec %>% 
+  select(Time, Value) %>% 
+  summary()
+```
+This data frame also has a low number of participants, but despite this, the average beats per minute are 77.33, which falls in the acceptable range of 60-100 bpm for men and women. 
+
+
+# Share:
+I am using the ggplot() function in RStudio to create visualizations to show trends in the data.
+```{r}
+p1 <- ggplot(data = daily_activity, mapping = aes(x=LightlyActiveMinutes, y=Calories))+
+  geom_jitter()+
+  geom_smooth(method = lm)
+
+p2 <- ggplot(data = daily_activity, mapping = aes(x=FairlyActiveMinutes, y=Calories))+
+  geom_jitter()+
+  geom_smooth(method = lm)
+
+p3 <- ggplot(data = daily_activity, mapping = aes(x=VeryActiveMinutes, y=Calories))+
+  geom_jitter()+
+  geom_smooth(method = lm)
+
+ggarrange(p1, p2, p3, ncol = 3)
+```
+
+**Figure 1** shows the relationship between lightly active minutes, fairly active minutes, and very active minutes compared to the number of calories a participant burned in a day. It shows that the more intense their activity is throughout the day, the more calories they burn.
+
+
+```{r}
+ggplot(data = daily_activity, mapping = aes(x=TotalSteps, y=Calories))+
+  geom_point()+
+  geom_smooth(method = lm)+
+  labs(title = "The relationship between Total Steps and Calories")
+```
+
+**Figure 2** shows the relationship between total steps taken in a day and total calories burned. It shows that the more steps a participant takes in a day, the more calories they burn.
+
+
+I am merging sleep_day and daily_activity to look at the relationship between the metrics in each dataset.
+```{r}
+data_merge1 <- left_join(sleep_day, daily_activity, by = c("ActivityDate", "Id"))
+```
+
+```{r}
+ggplot(data = data_merge1, mapping = aes(x=TotalMinutesAsleep, y=Calories))+
+  geom_point()+
+  geom_smooth(method = lm)+
+  labs(title = "The relationship between Total Minutes Asleep and Calories")
+```
+
+**Figure 3** shows the relationship between total minutes asleep and calories burned. I thought that maybe the more time a participant slept would affect the number of calories they burned. It shows that one did not have an effect on the other with these participants.
+
+
+```{r}
+ggplot(data = data_merge1, mapping = aes(x=TotalMinutesAsleep, y=SedentaryMinutes))+
+  geom_point()+
+  geom_smooth(method = lm)+
+  labs(title = "The relationship between Total Minutes Asleep and Sedentary Minutes")
+```
+
+**Figure 4** shows the relationship between total minutes asleep and sedentary minutes. It shows that the more time a participant spent sedentary during the day, the less they slept.
+
+# Act:
+## Conclusion:
+From the analysis results, it is a clear trend that the more active participants are living a healthier lifestyle. We see this in the comparison between the three intensities of active minutes. We also see how being sedentary for long periods of time can affect your sleep.
+
+## Recommendations:
+To get our users to be more active, I recommend implementing a leaderboard where the users can see how they stack up against their friends or other Bellabeat product users in various metrics. Also, a feature where users could create or join groups with their friends or other Bellabeat users and compete against each other in different fitness-related challenges. Lastly, a challenge system where users can attempt to complete preset daily, weekly, or monthly fitness-related challenges to earn themselves badges next to their profile name upon completion of the challenge. These ideas could increase our user's average daily activity through competition. Also, give them a sense of accomplishment after they complete challenges and reach their goals.
+
+As far as our marketing strategy, I suggest we focus on clearly communicating with our potential customers about what our products and services have to offer and the value they bring. Something like the Spring smart water bottle is very innovative and would help improve people's lives to make sure they stay hydrated throughout the day. Products like Ivy, Leaf, and Time would be perfect for people who want to track their health metrics but arent fans of the style that traditional smart fitness devices have.
+
+## Works Cited:
+Rieck, Thom. “10,000 steps a day: Too low? Too high?”, Mayo Clinic, March 20, 2020, [External link to mayoclinic.org] (https://www.mayoclinic.org/healthy-lifestyle/fitness/in-depth/10000-steps/art-20317391)
+
+Edward R. Laskowski, M.D. “How much should the average adult exercise every day?” Mayo Clinic, September 22, 2021, [External link to mayoclinic.org] (https://www.mayoclinic.org/healthy-lifestyle/fitness/expert-answers/exercise/faq-20057916)
+
+“How much sleep do I Need?” Centers for Disease Control and Prevention, March 2, 2017, [External link to cdc.gov] (https://www.cdc.gov/sleep/about_sleep/how_much_sleep.html)
+
+James Roland. “What Exactly Are METs, and What Should You Know About Them?”, healthline.com, October 21, 2019, [External link to healthline.com] (https://www.healthline.com/health/what-are-mets#bottom-line)
+
+Edward R. Laskowski, M.D. “What’s a normal resting heart rate?” Mayo Clinic, October 2, 2020, [External link to mayoclinic.org] (https://www.mayoclinic.org/healthy-lifestyle/fitness/expert-answers/heart-rate/faq-20057979)
+
+“About Adult BMI” Centers for Disease Control and Prevention, August 27, 2021, [External link to cdc.gov] (https://www.cdc.gov/healthyweight/assessing/bmi/adult_bmi/index.html)
+
+Lucy Gornall, “What is a calorie and how many calories should I eat to lose weight?” February 13, 2020, [External link to goodto.com] (https://www.goodto.com/wellbeing/diets-exercise/what-is-calorie-how-many-lose-weigt-425557)
